@@ -57,7 +57,9 @@ main{max-width:900px;margin:auto;padding:18px}.hero,.card{background:#0d2118;bor
 </div>
 </section>
 
-<section id="updates" style="display:none"><div class="card"><h2>Recent Updates</h2><div id="updatesList"></div></div></section>
+<section id="updates" style="display:none"><div class="card">
+<div class="team-head"><h2>Recent Updates</h2><button class="btn" onclick="clearUpdates()">Clear All</button></div>
+<div id="updatesList"></div></div></section>
 
 <section id="settings" style="display:none"><div class="card"><h2>Settings</h2>
 <label>Match name</label><input id="matchInput" class="modalInput" style="width:100%;padding:11px;background:#07140f;color:white;border:1px solid #37674d;border-radius:9px;margin:6px 0 12px">
@@ -144,6 +146,13 @@ async function saveSettings(){
 
 async function addUpdateText(text){
  const {error}=await db.from("updates").insert({text});if(error)console.error(error);
+}
+async function clearUpdates(){
+ if(!confirm("Delete all Recent Updates? This will remove them for everyone."))return;
+ const {error}=await db.from("updates").delete().not("id","is",null);
+ if(error)return toast(error.message);
+ toast("Recent Updates cleared");
+ load();
 }
 function displayToss(d){
  const coin=document.getElementById("coin");coin.textContent="🪙";coin.animate([{transform:"rotateY(0deg)"},{transform:"rotateY(720deg)"},{transform:"rotateY(1440deg)"}],{duration:850});
