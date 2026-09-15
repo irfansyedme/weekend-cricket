@@ -116,14 +116,25 @@ function render(){
  document.getElementById("teamBName").textContent=settings.captain_b||"Captain B";
  document.getElementById("playerCount").textContent=players.length;
  document.getElementById("players").innerHTML=players.map(p=>`<div class="playerrow"><button class="player" onclick="togglePlayer('${p.id}')">${esc(p.name)} ${p.team?`<span class="small muted">(${p.team==="A"?esc(settings.captain_a):esc(settings.captain_b)})</span>`:""}</button><button class="delete" title="Remove player" onclick="deletePlayer('${p.id}',event)">×</button></div>`).join("")||'<p class="muted">No players yet.</p>';
- document.getElementById("teamA").innerHTML=players.filter(p=>p.team==="A").map(p=>`<div class="playerrow"><button class="player">${esc(p.name)}</button></div>`).join("")||'<p class="muted">No players assigned.</p>';
- document.getElementById("teamB").innerHTML=players.filter(p=>p.team==="B").map(p=>`<div class="playerrow"><button class="player">${esc(p.name)}</button></div>`).join("")||'<p class="muted">No players assigned.</p>';
+ document.getElementById("teamA").innerHTML=players.filter(p=>p.team==="A").map(p=>`<div class="playerrow"><button class="player">${esc(p.name)}</button><button class="delete" title="Remove from team" onclick="removeFromTeam('${p.id}',event)">×</button></div>`).join("")||'<p class="muted">No players assigned.</p>';
+ document.getElementById("teamB").innerHTML=players.filter(p=>p.team==="B").map(p=>`<div class="playerrow"><button class="player">${esc(p.name)}</button><button class="delete" title="Remove from team" onclick="removeFromTeam('${p.id}',event)">×</button></div>`).join("")||'<p class="muted">No players assigned.</p>';
  document.getElementById("matchInput").value=settings.match_name||"";
  document.getElementById("captainAInput").value=settings.captain_a||"";
  document.getElementById("captainBInput").value=settings.captain_b||"";
  updateTossNames();
 }
 function togglePlayer(id){const p=players.find(x=>x.id===id);if(p)toast(p.name+(p.team?` is with ${p.team==="A"?settings.captain_a:settings.captain_b}`:" is unassigned"))}
+async function removeFromTeam(id,e){
+ e.stopPropagation();
+ const p=players.find(x=>x.id===id);
+ if(!p||!p.team)return;
+ const oldCaptain=p.team==="A"?settings.captain_a:settings.captain_b;
+ if(!confirm(`Remove ${p.name} from ${oldCaptain}'s team?`))return;
+ const {error}=await db.from("players").update({team:null}).eq("id",id);
+ if(error)return toast(error.message);
+ await addUpdateText(`${currentUser()} removed ${p.name} from ${oldCaptain}'s team.`);
+ toast(`${p.name} is now unassigned`);
+}
 async function deletePlayer(id,e){
  e.stopPropagation();const p=players.find(x=>x.id===id);if(!p)return;
  if(!confirm(`Remove ${p.name} completely from All Players?`))return;
