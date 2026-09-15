@@ -104,7 +104,7 @@ async function saveCaps(){const a=document.getElementById("capInputA").value.tri
 async function load(){
  const [p,s,t]=await Promise.all([db.from("players").select("*").order("created_at"),db.from("settings").select("*").eq("id",1).single(),db.from("toss").select("*").eq("id",1).maybeSingle()]);
  if(p.error||s.error)return toast("Database setup is incomplete. Check setup.sql.");
- players=p.data||[];settings=s.data||settings;toss=t.data||null;render();
+ players=p.data||[];settings=s.data||settings;toss=(t.data && t.data.side) ? t.data : null;render();
  const {data:up}=await db.from("updates").select("*").order("created_at",{ascending:false}).limit(30);drawUpdates(up||[]);
 }
 function drawUpdates(list){document.getElementById("updateList").innerHTML=list.length?list.map(u=>`<div class="update"><div class="time">${new Date(u.created_at).toLocaleString()}</div>${safe(u.text)}</div>`).join(""):'<span class="muted">No updates yet.</span>'}
