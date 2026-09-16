@@ -1,175 +1,143 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Weekend Cricket</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#07140f;color:#eef8f2}
-header{padding:22px 18px;background:#0d2419;border-bottom:1px solid #214c35;position:sticky;top:0;z-index:5}
-h1{margin:0;font-size:25px}.sub{color:#9db9aa;font-size:13px;margin-top:5px}
-nav{display:flex;gap:7px;overflow:auto;margin-top:16px}nav button,.btn{border:0;border-radius:10px;padding:10px 14px;background:#173a28;color:#dff4e6;cursor:pointer}nav button.active,.primary{background:#2d8a54;color:white}
-main{max-width:900px;margin:auto;padding:18px}.hero,.card{background:#0d2118;border:1px solid #1e4932;border-radius:16px;padding:18px;margin-bottom:15px}
-.hero h2{margin:0 0 7px}.muted{color:#9db9aa}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.card h3{margin-top:0}.playerrow{display:flex;align-items:center;gap:6px;margin:7px 0}.player{flex:1;text-align:left;background:#173a28;border:0;border-radius:9px;padding:10px;color:white}.delete{width:34px;background:#48201f;color:#ffb5b0;border:0;border-radius:9px;padding:9px;cursor:pointer}
-.team{min-height:100px}.team-head{display:flex;justify-content:space-between;align-items:center}.small{font-size:12px}
-.update{padding:10px 0;border-bottom:1px solid #1c3d2c}.update:last-child{border:0}
-.tossbox{text-align:center}.coin{width:80px;height:80px;border-radius:50%;background:#d9b44a;color:#332500;display:flex;align-items:center;justify-content:center;margin:15px auto;font-weight:bold;font-size:18px;box-shadow:0 4px 15px #0005}.choice{display:flex;gap:8px;justify-content:center;margin:10px 0}.choice button{flex:1;max-width:180px}.selected{outline:2px solid #69d18e;background:#225f3d!important}
-.modalback{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;padding:18px;z-index:20}.modal{width:min(500px,100%);background:#0d2118;border:1px solid #2b6445;border-radius:16px;padding:20px}.modal h3{margin-top:0}.modal input{width:100%;padding:12px;border-radius:9px;border:1px solid #37674d;background:#07140f;color:white;margin:8px 0 13px}.listbtn{display:block;width:100%;text-align:left;margin:7px 0}.close{float:right;background:none;border:0;color:#aaa;font-size:24px;cursor:pointer}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1d4f34;padding:12px 18px;border-radius:10px;display:none;z-index:30}
-@media(max-width:650px){.grid{grid-template-columns:1fr}main{padding:12px}}
+*{box-sizing:border-box}body{margin:0;background:#06100b;color:#f5faf7;font-family:system-ui,-apple-system,Segoe UI,sans-serif}
+:root{--card:#0d1d16;--card2:#12271d;--line:#234435;--green:#45e08a;--muted:#9db0a5}
+.wrap{max-width:1050px;margin:auto;padding:16px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0 20px}
+.brand{display:flex;align-items:center;gap:10px}.logo{font-size:32px}.brand h1{margin:0;font-size:22px}.muted{color:var(--muted);font-size:13px}
+nav{display:flex;gap:7px;flex-wrap:wrap}button{border:0;border-radius:11px;padding:11px 14px;background:var(--card2);color:#fff;font-weight:750;cursor:pointer;touch-action:manipulation}button:active{transform:scale(.98)}button.primary{background:var(--green);color:#062012}button.danger{color:#ffaaa6}button:disabled{opacity:.45;cursor:not-allowed}
+.card{background:linear-gradient(145deg,#0d1e16,#0a1711);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:15px;box-shadow:0 12px 35px #0004}
+.hero{display:grid;grid-template-columns:1.4fr .6fr;gap:15px}.hero h2{font-size:36px;margin:7px 0}.pill{display:inline-block;padding:6px 10px;background:#173c2a;color:#b8f5d0;border-radius:999px;font-size:11px;font-weight:800}
+.stat{display:flex;align-items:center;justify-content:center;min-height:130px}.stat strong{font-size:38px;display:block}.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.title{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.title h3{margin:0}.players{display:flex;flex-wrap:wrap;gap:8px}.player{border:1px solid var(--line);background:#10251b}.player.sel{background:#246541;border-color:var(--green)}
+.team{min-height:170px}.cap{color:var(--green);font-size:13px;font-weight:800}.member{display:flex;justify-content:space-between;align-items:center;padding:9px 10px;background:#0a1711;border-radius:10px;margin:7px 0}.mini{padding:5px 8px;font-size:11px;background:transparent;color:#ffaaa6}
+.toss{text-align:center}.choices{display:flex;justify-content:center;gap:8px;margin:12px 0}.choice.active{outline:3px solid var(--green);background:#246541}.coin{width:118px;height:118px;border-radius:50%;margin:15px auto;display:grid;place-items:center;background:linear-gradient(145deg,#f5d46d,#a87310);border:7px solid #f8e6a9;color:#543805;font-size:20px;font-weight:900}.flip{animation:spin .9s ease-in-out}@keyframes spin{0%{transform:rotateY(0)}50%{transform:rotateY(900deg)}100%{transform:rotateY(1800deg)}}
+.updates{display:flex;flex-direction:column;gap:8px}.update{padding:11px;border-left:3px solid var(--green);background:#0b1b14;border-radius:9px}.time{font-size:11px;color:var(--muted);margin-bottom:3px}
+.row{display:flex;gap:8px;flex-wrap:wrap}.input{flex:1;min-width:170px;border:1px solid var(--line);background:#07110c;color:#fff;border-radius:10px;padding:11px}.status{font-size:12px;color:var(--muted)}
+.modal{position:fixed;inset:0;background:#000b;display:none;place-items:center;padding:15px;z-index:10}.modal.show{display:grid}.modalbox{width:min(520px,100%);background:#0c1c15;border:1px solid var(--line);border-radius:18px;padding:18px}.close{float:right}.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#effff5;color:#072015;padding:10px 15px;border-radius:12px;font-weight:800;display:none;z-index:20}.toast.show{display:block}
+@media(max-width:720px){.cricket-animation{width:50px;height:42px}.cricket-animation svg{width:52px;height:42px}.hero,.grid{grid-template-columns:1fr}.hero h2{font-size:30px}.top{align-items:flex-start;flex-direction:column}.top nav{width:100%}.top nav button{flex:1}.card{padding:15px}}
 
-.brand{display:flex;align-items:center;gap:10px}.brand>span{font-size:26px;background:#173a28;border-radius:12px;padding:8px}.brand h1{margin:0;font-size:21px}.settings-top{position:absolute;right:16px;top:16px;background:#173a28;color:white;border:0;border-radius:10px;padding:9px;cursor:pointer}.eyebrow{font-size:11px;letter-spacing:1.4px;color:#69d18e;font-weight:800}.hero{display:flex;justify-content:space-between;align-items:center;gap:18px}.hero-actions{display:flex;gap:8px;flex-wrap:wrap}.page-title{display:flex;justify-content:space-between;align-items:flex-end;gap:15px;margin-bottom:16px}.page-title h2{margin:3px 0}.stats{grid-template-columns:repeat(3,1fr)}.stat{display:flex;align-items:center;gap:12px;margin:0}.stat>span{font-size:22px;background:#173a28;border-radius:12px;padding:10px}.stat strong,.stat small{display:block}.stat small{color:var(--muted);margin-top:3px}.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px}.section-title h3,.teams-heading h3{margin:0}.section-title p,.teams-heading p{margin:4px 0 0}.count-pill{font-size:11px;background:#173a28;border-radius:99px;padding:4px 8px}.search-row{display:flex;align-items:center;gap:8px;background:#07170f;border:1px solid #28523a;border-radius:12px;padding:0 12px;margin:14px 0}.search-row input{border:0;outline:0;background:transparent;color:white;width:100%;padding:12px 0}.players-list{max-height:330px;overflow:auto}.captain-card.green{border-left:4px solid #2d8a54}.captain-card.blue{border-left:4px solid #3979b8}.label{font-size:10px;letter-spacing:1px;font-weight:800}.teams-heading{margin:23px 2px 11px}.user-chip{display:inline-block;background:#132e21;border:1px solid #28543a;border-radius:99px;padding:8px 14px;color:#c9e6d3;font-size:13px}.flip-btn{width:100%;max-width:380px;padding:13px}.toss-result{min-height:55px;margin-top:18px;line-height:1.6}.mini-team{background:#122b1f;border:1px solid #1b4930;border-radius:13px;padding:15px}.mini-team strong,.mini-team span{display:block}.mini-team span{color:var(--muted);font-size:12px;margin-top:4px}.settings-card{max-width:650px}.settings-card label{display:block;font-size:13px;color:#bdd5c6;margin-top:12px}.settings-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:17px}@media(max-width:650px){header{padding:13px 12px}.settings-top{right:12px;top:14px}.hero,.page-title{display:block}.hero-actions{margin-top:15px}.stats{grid-template-columns:1fr}.page-title>.btn{width:100%;margin-top:12px}.players-list{max-height:300px}.tossbox{padding:20px 14px}}
+.cricket-animation{width:62px;height:48px;display:grid;place-items:center;background:#173b28;border-radius:13px;overflow:hidden;flex:none}
+.cricket-animation svg{width:60px;height:48px}
+.cricket-animation .head,.cricket-animation .body,.cricket-animation .swing{fill:none;stroke:#8ee3a7;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.cricket-animation .bat{fill:none;stroke:#d8b45a;stroke-width:5;stroke-linecap:round}
+.cricket-animation .ball{fill:#d94b4b;animation:ballFly 1.9s ease-in-out infinite}
+.cricket-animation .motion{fill:none;stroke:#7bcf96;stroke-width:2;stroke-linecap:round;stroke-dasharray:3 4;opacity:.65;animation:fadeMotion 1.9s ease-in-out infinite}
+@keyframes ballFly{0%,22%{transform:translate(0,0)}55%{transform:translate(-27px,23px)}75%,100%{transform:translate(0,0)}}
+@keyframes fadeMotion{0%,35%,100%{opacity:0}55%,75%{opacity:.65}}
+.dua-card{position:relative;overflow:hidden;text-align:center;background:linear-gradient(145deg,#102d1e,#0a2016)}
+.dua-label{font-size:11px;letter-spacing:1.5px;color:#75d493;font-weight:800}
+.dua-arabic{font-family:"Noto Naskh Arabic","Amiri","Times New Roman",serif;font-size:24px;line-height:1.9;margin:12px auto 6px;direction:rtl}
+.dua-trans{color:#a9cbb6;font-style:italic;font-size:13px;line-height:1.6}
+.dua-meaning{margin:10px auto 0;max-width:720px;color:#e6f4eb;line-height:1.55;font-size:14px}
 </style>
 </head>
 <body>
-<header>
-<div class="brand"><span>🏏</span><div><h1>Weekend Cricket</h1><div class="sub">Your live match hub</div></div></div>
-<button class="settings-top" onclick="showSection('settings')">⚙️</button>
-<nav>
-<button data-section="home" onclick="showSection('home')">🏠 Home</button>
-<button data-section="teams" onclick="showSection('teams')">👥 Teams</button>
-<button data-section="toss" onclick="showSection('toss')">🪙 Toss</button>
-<button data-section="updates" onclick="showSection('updates')">📰 Updates</button>
-</nav>
+<div class="wrap">
+<header class="top">
+<div class="cricket-animation" aria-hidden="true">
+<svg viewBox="0 0 90 70">
+<circle class="ball" cx="75" cy="17" r="5"/>
+<path class="bat" d="M56 39 L74 12"/>
+<circle class="head" cx="31" cy="18" r="7"/>
+<path class="body" d="M31 27 L31 46 M31 31 L18 39 M31 31 L45 27 M31 46 L21 62 M31 46 L43 60"/>
+<path class="swing" d="M45 27 Q58 31 64 40"/>
+<path class="motion" d="M73 17 Q83 22 87 30"/>
+</svg>
+</div>
+ <div class="brand"><div class="logo">🏏</div><div><h1>Weekend Cricket</h1><div class="muted">Live shared match board</div></div></div>
+ <nav><button onclick="go('teams')">Teams</button><button onclick="go('toss')">🪙 Toss</button><button onclick="go('updates')">Updates</button><button onclick="openSettings()">⚙️</button></nav>
 </header>
 
-<main>
-<section id="home">
-<div class="hero"><div><div class="eyebrow">🏏 WEEKEND MATCH</div><h2 id="matchName">Weekend Cricket</h2><p class="muted">Everything you need for today's game.</p></div><div class="hero-actions"><button class="btn primary" onclick="showSection('teams')">👥 Manage Teams</button><button class="btn" onclick="showSection('toss')">🪙 Coin Toss</button></div></div>
-<div class="grid stats"><div class="card stat"><span>👥</span><div><strong id="playerCount">0</strong><small>Players</small></div></div><div class="card stat"><span>🟢</span><div><strong id="homeCaptainA">Captain A</strong><small>Captain A</small></div></div><div class="card stat"><span>🔵</span><div><strong id="homeCaptainB">Captain B</strong><small>Captain B</small></div></div></div>
-<div class="card"><div class="section-title"><div><h3>Quick Team View</h3><p class="muted">Current players under each captain</p></div><button class="btn" onclick="showSection('teams')">Open Teams →</button></div><div class="grid"><div class="mini-team"><strong id="homeTeamAName">Captain A</strong><span id="homeTeamACount">0 players</span></div><div class="mini-team"><strong id="homeTeamBName">Captain B</strong><span id="homeTeamBCount">0 players</span></div></div></div>
+<section class="hero">
+ <div class="card"><span class="pill">WEEKEND MATCH</span><h2 id="matchName">Saturday Cricket</h2><div class="muted">Everyone sees the same data in real time.</div></div>
+ <div class="card stat"><div><strong id="count">0</strong><span class="muted">players</span></div></div>
 </section>
-<section id="teams" style="display:none">
-<div class="page-title"><div><div class="eyebrow">TEAM MANAGEMENT</div><h2>Players & Teams</h2><p class="muted">Add players, build teams and move players anytime.</p></div><button class="btn primary" onclick="openAddPlayer()">＋ Add Player</button></div>
-<div class="card"><div class="section-title"><div><h3>👥 All Players <span class="count-pill" id="playerCountTeams">0</span></h3><p class="muted">Alphabetically sorted</p></div></div><div class="search-row">🔍<input id="playerSearch" placeholder="Search player..." oninput="renderPlayersOnly()"></div><div id="players" class="players-list"></div></div>
-<div class="teams-heading"><h3>Captain Teams</h3><p class="muted">Only unassigned players appear when you press + Add.</p></div>
-<div class="grid"><div class="card captain-card green"><div class="team-head"><div><span class="label">🟢 TEAM</span><h3 id="teamAName">Captain A</h3><span id="teamACount" class="muted small">0 players</span></div><button class="btn" onclick="openAssign('A')">＋ Add</button></div><div id="teamA"></div></div><div class="card captain-card blue"><div class="team-head"><div><span class="label">🔵 TEAM</span><h3 id="teamBName">Captain B</h3><span id="teamBCount" class="muted small">0 players</span></div><button class="btn" onclick="openAssign('B')">＋ Add</button></div><div id="teamB"></div></div></div>
-</section>
-<section id="toss" style="display:none"><div class="page-title"><div><div class="eyebrow">LIVE TOSS</div><h2>🪙 Coin Toss</h2><p class="muted">Flip as many times as you need.</p></div></div><div class="card tossbox"><div class="user-chip">👤 Flipping as <strong id="flipperName">Guest</strong></div><p>Which captain are you flipping on behalf of?</p><div class="choice"><button id="captainChoiceA" class="btn" onclick="chooseCaptain('A')">Captain A</button><button id="captainChoiceB" class="btn" onclick="chooseCaptain('B')">Captain B</button></div><p>Which side is the captain calling?</p><div class="choice"><button id="headsBtn" class="btn" onclick="chooseSide('Heads')">HEADS</button><button id="tailsBtn" class="btn" onclick="chooseSide('Tails')">TAILS</button></div><div class="coin" id="coin">?</div><button class="btn primary flip-btn" onclick="flip()">🪙 FLIP COIN</button><div id="tossResult" class="toss-result"></div></div></section>
-<section id="updates" style="display:none"><div class="page-title"><div><div class="eyebrow">MATCH ACTIVITY</div><h2>📰 Recent Updates</h2><p class="muted">Shared activity from everyone using the website.</p></div><button class="btn" onclick="clearUpdates()">Clear All</button></div><div class="card"><div id="updatesList"></div></div></section>
-<section id="settings" style="display:none"><div class="page-title"><div><div class="eyebrow">CUSTOMIZE</div><h2>⚙️ Settings</h2><p class="muted">Update your match and captain names.</p></div></div><div class="card settings-card"><label>Match name</label><input id="matchInput" class="modalInput"><label>Captain A</label><input id="captainAInput" class="modalInput"><label>Captain B</label><input id="captainBInput" class="modalInput"><div class="settings-actions"><button class="btn primary" onclick="saveSettings()">Save Settings</button><button class="btn" onclick="changeUserName()">👤 Change my name</button></div></div></section>
-</main>
 
-<div class="modalback" id="modalBack"><div class="modal" id="modal"></div></div>
+<section class="card" id="playersCard">
+ <div class="title"><h3>👥 All Players</h3><button onclick="openPlayer()">＋ Player</button></div>
+ <div class="players" id="players"></div>
+ <div class="status" style="margin-top:10px">Tap a player to select them, then assign them to Team A or B.</div>
+</section>
+
+<section class="grid" id="teams">
+ <div class="card team"><div class="title"><div><h3>🟢 Team A</h3><div class="cap" id="capA">Captain A</div></div><button onclick="assign('A')">Assign</button></div><div id="teamA"></div></div>
+ <div class="card team"><div class="title"><div><h3>🔵 Team B</h3><div class="cap" id="capB">Captain B</div></div><button onclick="assign('B')">Assign</button></div><div id="teamB"></div></div>
+</section>
+
+<section class="card toss" id="toss">
+ <div class="title"><h3>🪙 Coin Toss</h3><span class="pill" id="tossStatus">Waiting</span></div>
+ <div class="muted">The first completed toss is stored online and becomes the official result.</div>
+ <div class="choices"><button id="heads" class="choice" onclick="pick('Heads')">HEADS</button><button id="tails" class="choice" onclick="pick('Tails')">TAILS</button></div>
+ <div class="coin" id="coin">?</div>
+ <button class="primary" id="flip" onclick="flip()">FLIP COIN</button>
+ <div id="result" style="font-weight:900;font-size:18px;margin-top:12px"></div>
+</section>
+
+<section class="card" id="updates">
+ <div class="title"><h3>📢 Recent Updates</h3><button onclick="addUpdate()">＋ Update</button></div>
+ <div class="updates" id="updateList"></div>
+</section>
+</div>
+
+<div class="modal" id="settingsModal"><div class="modalbox"><button class="close" onclick="closeSettings()">✕</button><h3>⚙️ Match Settings</h3>
+ <div class="muted">Anyone with the URL can edit this version. Do not put private information here.</div>
+ <div class="row" style="margin-top:14px"><input id="matchInput" class="input" placeholder="Match name"><button class="primary" onclick="saveMatch()">Save</button></div>
+ <div class="row" style="margin-top:9px"><input id="capInputA" class="input" placeholder="Captain A"><input id="capInputB" class="input" placeholder="Captain B"><button onclick="saveCaps()">Save</button></div>
+</div></div>
+<div class="modal" id="playerModal"><div class="modalbox"><button class="close" onclick="closePlayer()">✕</button><h3>＋ Add Player</h3><div class="row"><input id="playerInput" class="input" placeholder="Player name"><button class="primary" onclick="createPlayer()">Add</button></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
 const CONFIG={url:"https://eldkosreggeddorvjzdi.supabase.co",key:"sb_publishable_TaSGPB43zh0FJzhS0-3grg_OEI_UPxE"};
-const db=supabase.createClient(CONFIG.url,CONFIG.key);
-let players=[],settings={match_name:"Weekend Cricket",captain_a:"Captain A",captain_b:"Captain B"};
-let selectedCaptain=null,selectedSide=null,currentUserName=localStorage.getItem("weekend_cricket_user_name")||"";
-
-function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function toast(t){const x=document.getElementById("toast");x.textContent=t;x.style.display="block";setTimeout(()=>x.style.display="none",2200)}
-function openModal(html){document.getElementById("modal").innerHTML=html;document.getElementById("modalBack").style.display="flex"}
-function closeModal(){document.getElementById("modalBack").style.display="none"}
-function currentUser(){return currentUserName||"Guest"}
-
-function openUserModal(force=false){
- if(!force && currentUserName)return;
- openModal(`<button class="close" onclick="closeModal()">×</button><h3>Welcome to Weekend Cricket</h3><p class="muted">Enter your name. It will be remembered on this browser.</p><input id="userNameInput" placeholder="Your name" value="${esc(currentUserName)}"><button class="btn primary" onclick="saveUserName()">Continue</button>`);
- setTimeout(()=>document.getElementById("userNameInput")?.focus(),50);
-}
-function saveUserName(){
- const n=document.getElementById("userNameInput").value.trim();
- if(!n)return toast("Please enter your name");
- currentUserName=n;localStorage.setItem("weekend_cricket_user_name",n);document.getElementById("flipperName").textContent=n;closeModal();toast("Name saved");
-}
-function changeUserName(){openUserModal(true)}
-
-function showSection(s){document.querySelectorAll("main>section").forEach(x=>x.style.display=x.id===s?"block":"none");document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x.dataset.section===s));if(s==="toss")updateTossNames();if(s==="teams")renderPlayersOnly();window.scrollTo({top:0,behavior:"smooth"})}
-function updateTossNames(){
- document.getElementById("flipperName").textContent=currentUser();
- document.getElementById("captainChoiceA").textContent=settings.captain_a||"Captain A";
- document.getElementById("captainChoiceB").textContent=settings.captain_b||"Captain B";
-}
-function chooseCaptain(t){selectedCaptain=t;document.getElementById("captainChoiceA").classList.toggle("selected",t==="A");document.getElementById("captainChoiceB").classList.toggle("selected",t==="B")}
-function chooseSide(s){selectedSide=s;document.getElementById("headsBtn").classList.toggle("selected",s==="Heads");document.getElementById("tailsBtn").classList.toggle("selected",s==="Tails")}
-
+let db=null, players=[], settings={match_name:"Saturday Cricket",captain_a:"Captain A",captain_b:"Captain B"}, selected=null, toss=null;
+function toast(t){const x=document.getElementById("toast");x.textContent=t;x.classList.add("show");setTimeout(()=>x.classList.remove("show"),1800)}
+function go(id){document.getElementById(id).scrollIntoView({behavior:"smooth"})}
+function openSettings(){document.getElementById("settingsModal").classList.add("show");document.getElementById("matchInput").value=settings.match_name;document.getElementById("capInputA").value=settings.captain_a;document.getElementById("capInputB").value=settings.captain_b}
+function closeSettings(){document.getElementById("settingsModal").classList.remove("show")}
+function openPlayer(){document.getElementById("playerModal").classList.add("show");setTimeout(()=>document.getElementById("playerInput").focus(),100)}
+function closePlayer(){document.getElementById("playerModal").classList.remove("show")}
+function safe(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function render(){
- players.sort((a,b)=>String(a.name||"").localeCompare(String(b.name||""),undefined,{sensitivity:"base"}));
- document.getElementById("matchName").textContent=settings.match_name||"Weekend Cricket";
- document.getElementById("teamAName").textContent=settings.captain_a||"Captain A";document.getElementById("teamBName").textContent=settings.captain_b||"Captain B";
- document.getElementById("homeCaptainA").textContent=settings.captain_a||"Captain A";document.getElementById("homeCaptainB").textContent=settings.captain_b||"Captain B";document.getElementById("homeTeamAName").textContent=settings.captain_a||"Captain A";document.getElementById("homeTeamBName").textContent=settings.captain_b||"Captain B";
- const ac=players.filter(p=>p.team==="A").length,bc=players.filter(p=>p.team==="B").length;document.getElementById("playerCount").textContent=players.length;document.getElementById("playerCountTeams").textContent=players.length;document.getElementById("teamACount").textContent=`${ac} player${ac===1?"":"s"}`;document.getElementById("teamBCount").textContent=`${bc} player${bc===1?"":"s"}`;document.getElementById("homeTeamACount").textContent=`${ac} player${ac===1?"":"s"}`;document.getElementById("homeTeamBCount").textContent=`${bc} player${bc===1?"":"s"}`;
- document.getElementById("matchInput").value=settings.match_name||"";document.getElementById("captainAInput").value=settings.captain_a||"";document.getElementById("captainBInput").value=settings.captain_b||"";
- renderPlayersOnly();
- document.getElementById("teamA").innerHTML=players.filter(p=>p.team==="A").map(p=>`<div class="playerrow"><button class="player">${esc(p.name)}</button><button class="delete" title="Remove from team" onclick="removeFromTeam('${p.id}',event)">×</button></div>`).join("")||'<p class="muted">No players assigned yet.</p>';
- document.getElementById("teamB").innerHTML=players.filter(p=>p.team==="B").map(p=>`<div class="playerrow"><button class="player">${esc(p.name)}</button><button class="delete" title="Remove from team" onclick="removeFromTeam('${p.id}',event)">×</button></div>`).join("")||'<p class="muted">No players assigned yet.</p>';updateTossNames();
+ document.getElementById("matchName").textContent=settings.match_name;document.getElementById("capA").textContent=settings.captain_a;document.getElementById("capB").textContent=settings.captain_b;
+ document.getElementById("count").textContent=players.length;
+ document.getElementById("players").innerHTML=players.map(p=>`<button class="player ${selected===p.id?"sel":""}" onclick="selectPlayer('${p.id}')">${safe(p.name)}</button>`).join("")||'<span class="muted">No players yet.</span>';
+ const a=players.filter(p=>p.team==="A"),b=players.filter(p=>p.team==="B");
+ document.getElementById("teamA").innerHTML=a.length?a.map(p=>row(p)).join(""):'<span class="muted">No players assigned.</span>';
+ document.getElementById("teamB").innerHTML=b.length?b.map(p=>row(p)).join(""):'<span class="muted">No players assigned.</span>';
+ if(toss){document.getElementById("tossStatus").textContent="Completed";document.getElementById("coin").textContent=toss.side.toUpperCase();document.getElementById("result").textContent=`${toss.side} — ${safe(toss.winner)} won the toss!`;document.getElementById("flip").disabled=true}
+ else{document.getElementById("tossStatus").textContent="Waiting";document.getElementById("coin").textContent="?";document.getElementById("result").textContent="";document.getElementById("flip").disabled=false}
+ document.getElementById("heads").classList.toggle("active",window.choice==="Heads");document.getElementById("tails").classList.toggle("active",window.choice==="Tails");
 }
-function renderPlayersOnly(){const q=(document.getElementById("playerSearch")?.value||"").trim().toLowerCase();const f=players.filter(p=>String(p.name||"").toLowerCase().includes(q));document.getElementById("players").innerHTML=f.map(p=>`<div class="playerrow"><button class="player" onclick="togglePlayer('${p.id}')">${esc(p.name)} ${p.team?`<span class="small muted">• ${p.team==="A"?esc(settings.captain_a):esc(settings.captain_b)}</span>`:""}</button><button class="delete" title="Delete player" onclick="deletePlayer('${p.id}',event)">×</button></div>`).join("")||'<p class="muted">No matching players.</p>'}
-function togglePlayer(id){const p=players.find(x=>x.id===id);if(p)toast(p.name+(p.team?` is with ${p.team==="A"?settings.captain_a:settings.captain_b}`:" is unassigned"))}
-async function removeFromTeam(id,e){
- e.stopPropagation();
- const p=players.find(x=>x.id===id);
- if(!p||!p.team)return;
- const oldCaptain=p.team==="A"?settings.captain_a:settings.captain_b;
- if(!confirm(`Remove ${p.name} from ${oldCaptain}'s team?`))return;
- const {error}=await db.from("players").update({team:null}).eq("id",id);
- if(error)return toast(error.message);
- await addUpdateText(`${currentUser()} removed ${p.name} from ${oldCaptain}'s team.`);
- toast(`${p.name} is now unassigned`);
-}
-async function deletePlayer(id,e){
- e.stopPropagation();const p=players.find(x=>x.id===id);if(!p)return;
- if(!confirm(`Remove ${p.name} completely from All Players?`))return;
- const {error}=await db.from("players").delete().eq("id",id);if(error)return toast(error.message);
- await addUpdateText(`${currentUser()} removed ${p.name} from the player list.`);
- toast("Player removed");
-}
-function openAddPlayer(){openModal(`<button class="close" onclick="closeModal()">×</button><h3>Add Player</h3><input id="newPlayer" placeholder="Player name"><button class="btn primary" onclick="addPlayer()">Add Player</button>`);setTimeout(()=>document.getElementById("newPlayer")?.focus(),50)}
-async function addPlayer(){const n=document.getElementById("newPlayer").value.trim();if(!n)return toast("Enter a player name");const {error}=await db.from("players").insert({name:n});if(error)return toast(error.message);await addUpdateText(`${currentUser()} added ${n} to All Players.`);closeModal();toast("Player added")}
-function openAssign(team){
- const available=players.filter(p=>!p.team);
- const captain=team==="A"?settings.captain_a:settings.captain_b;
- openModal(`<button class="close" onclick="closeModal()">×</button><h3>Add players to ${esc(captain)}</h3>${available.length?available.map(p=>`<button class="btn listbtn" onclick="assignPlayer('${p.id}','${team}')">${esc(p.name)}</button>`).join(""):'<p class="muted">No unassigned players available.</p>'}`);
-}
-async function assignPlayer(id,team){const p=players.find(x=>x.id===id);if(!p||p.team)return;const {error}=await db.from("players").update({team}).eq("id",id);if(error)return toast(error.message);const captain=team==="A"?settings.captain_a:settings.captain_b;await addUpdateText(`${currentUser()} assigned ${p.name} to ${captain}.`);openAssign(team);toast(`${p.name} added to ${captain}`)}
-async function saveSettings(){
- const match=document.getElementById("matchInput").value.trim()||"Weekend Cricket",a=document.getElementById("captainAInput").value.trim()||"Captain A",b=document.getElementById("captainBInput").value.trim()||"Captain B";
- const {error}=await db.from("settings").upsert({id:1,match_name:match,captain_a:a,captain_b:b});if(error)return toast(error.message);await addUpdateText(`${currentUser()} updated the match settings.`);toast("Settings saved")
-}
-
-async function addUpdateText(text){
- const {error}=await db.from("updates").insert({text});if(error)console.error(error);
-}
-async function clearUpdates(){
- if(!confirm("Delete all Recent Updates? This will remove them for everyone."))return;
- const {error}=await db.from("updates").delete().not("id","is",null);
- if(error)return toast(error.message);
- toast("Recent Updates cleared");
- load();
-}
-function displayToss(d){
- const coin=document.getElementById("coin");coin.textContent="🪙";coin.animate([{transform:"rotateY(0deg)"},{transform:"rotateY(720deg)"},{transform:"rotateY(1440deg)"}],{duration:850});
- setTimeout(()=>{coin.textContent=d.result.toUpperCase();document.getElementById("tossResult").innerHTML=`<strong>${esc(d.result)} — ${esc(d.winner)} won the toss!</strong><br><span class="muted">Flipped by ${esc(d.flipper)} on behalf of ${esc(d.captain)}. ${esc(d.captain)} called ${esc(d.choice)}.</span>`},850);
-}
-async function flip(){
- if(!currentUserName){openUserModal(true);return}
- if(!selectedCaptain||!selectedSide)return toast("Choose captain and Heads/Tails first");
- const captain=settings[selectedCaptain==="A"?"captain_a":"captain_b"]||`Captain ${selectedCaptain}`;
- const other=settings[selectedCaptain==="A"?"captain_b":"captain_a"]||`Captain ${selectedCaptain==="A"?"B":"A"}`;
- const result=Math.random()<.5?"Heads":"Tails",winner=result===selectedSide?captain:other;
- const d={result,winner,flipper:currentUserName,captain,choice:selectedSide};
- displayToss(d);
- await channel.send({type:"broadcast",event:"coin_toss",payload:d});
- await addUpdateText(`🪙 ${result} — ${winner} won the toss. Flipped by ${currentUserName} on behalf of ${captain}; ${captain} called ${selectedSide}.`);
-}
-
-let channel=db.channel("weekend-cricket-live");
-channel.on("broadcast",{event:"coin_toss"},({payload})=>displayToss(payload)).subscribe();
-
+function row(p){return `<div class="member"><span>${safe(p.name)}</span><button class="mini" onclick="removeTeam('${p.id}')">Remove</button></div>`}
+function selectPlayer(id){selected=id;render();toast("Player selected")}
+async function assign(team){if(!selected)return toast("Select a player first");const {error}=await db.from("players").update({team}).eq("id",selected);if(error)return toast(error.message);selected=null}
+async function removeTeam(id){const {error}=await db.from("players").update({team:null}).eq("id",id);if(error)toast(error.message)}
+async function createPlayer(){const n=document.getElementById("playerInput").value.trim();if(!n)return;if(!db)return toast("Connect Supabase first");const {error}=await db.from("players").insert({name:n});if(error)toast(error.message);else{document.getElementById("playerInput").value="";closePlayer();await addUpdateText(n+" joined the player list")}}
+window.choice=null;
+function pick(x){if(toss)return;window.choice=x;render()}
+async function flip(){if(toss)return toast("Toss already completed");if(!window.choice)return toast("Choose Heads or Tails first");const btn=document.getElementById("flip");btn.disabled=true;document.getElementById("coin").classList.add("flip");const {data,error}=await db.rpc("flip_toss",{p_choice:window.choice,p_captain_a:settings.captain_a,p_captain_b:settings.captain_b});setTimeout(()=>document.getElementById("coin").classList.remove("flip"),900);if(error){btn.disabled=false;return toast(error.message)}await addUpdateText("Coin toss: "+data.side+". "+data.winner+" won the toss!")}
+async function addUpdate(){const t=prompt("Enter match update:");if(t)await addUpdateText(t)}
+async function addUpdateText(t){const {error}=await db.from("updates").insert({text:t});if(error)toast(error.message)}
+async function saveMatch(){const v=document.getElementById("matchInput").value.trim()||"Saturday Cricket";const {error}=await db.from("settings").update({match_name:v}).eq("id",1);if(error)toast(error.message);else closeSettings()}
+async function saveCaps(){const a=document.getElementById("capInputA").value.trim()||"Captain A",b=document.getElementById("capInputB").value.trim()||"Captain B";const {error}=await db.from("settings").update({captain_a:a,captain_b:b}).eq("id",1);if(error)toast(error.message);else closeSettings()}
 async function load(){
- const [s,p,u]=await Promise.all([db.from("settings").select("*").eq("id",1).maybeSingle(),db.from("players").select("*").order("created_at",{ascending:true}),db.from("updates").select("*").order("created_at",{ascending:false}).limit(30)]);
- if(s.data)settings=s.data;if(p.data)players=p.data;
- render();
- document.getElementById("updatesList").innerHTML=(u.data||[]).map(x=>`<div class="update">${esc(x.text)}<div class="small muted">${new Date(x.created_at).toLocaleString()}</div></div>`).join("")||'<p class="muted">No updates yet.</p>';
+ const [p,s,t]=await Promise.all([db.from("players").select("*").order("created_at"),db.from("settings").select("*").eq("id",1).single(),db.from("toss").select("*").eq("id",1).maybeSingle()]);
+ if(p.error||s.error)return toast("Database setup is incomplete. Check setup.sql.");
+ players=p.data||[];settings=s.data||settings;toss=t.data||null;render();
+ const {data:up}=await db.from("updates").select("*").order("created_at",{ascending:false}).limit(30);drawUpdates(up||[]);
 }
-db.channel("weekend-cricket-db").on("postgres_changes",{event:"*",schema:"public",table:"players"},load).on("postgres_changes",{event:"*",schema:"public",table:"settings"},load).on("postgres_changes",{event:"*",schema:"public",table:"updates"},load).subscribe();
-
-showSection("home");load();setTimeout(()=>openUserModal(false),300);
+function drawUpdates(list){document.getElementById("updateList").innerHTML=list.length?list.map(u=>`<div class="update"><div class="time">${new Date(u.created_at).toLocaleString()}</div>${safe(u.text)}</div>`).join(""):'<span class="muted">No updates yet.</span>'}
+async function init(){
+ if(CONFIG.url.startsWith("PASTE_")){toast("Open index.html and add your Supabase URL/key first");return}
+ db=supabase.createClient(CONFIG.url,CONFIG.key);await load();
+ db.channel("weekend-cricket").on("postgres_changes",{event:"*",schema:"public",table:"players"},load).on("postgres_changes",{event:"*",schema:"public",table:"settings"},load).on("postgres_changes",{event:"*",schema:"public",table:"toss"},load).on("postgres_changes",{event:"*",schema:"public",table:"updates"},load).subscribe();
+}
+init();
 </script>
 </body>
 </html>
